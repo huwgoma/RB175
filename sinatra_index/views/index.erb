@@ -1,0 +1,22 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= @title %></title>
+</head>
+<body>
+  <h1>Files</h1>
+  <ul>
+    <% @files.each do |file| %>
+      <li>
+        <a href=<%= file %>><%= file %></a>
+      </li>
+    <% end %>
+  </ul>
+
+  <p>
+    <% sort_by = params[:sort] == 'descending' ? 'ascending' : 'descending' %>
+    <a href=<%= "/?sort=#{sort_by}" %>>Sort by <%= sort_by %></a>
+  </p>
+</body>
+</html>
