@@ -1,0 +1,9 @@
+<h2>Details for <%= params[:name] %>:</h2>
+
+<p>Email: <%= @user[:email] %></p>
+<p>Interests: <%= @user[:interests].join(', ') %></p>
+
+<h4>Other Users:</h4>
+<ul>
+  <%= list_users(params[:name]) %>
+</ul>
