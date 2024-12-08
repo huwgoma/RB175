@@ -9,9 +9,12 @@ GEM
     multi_json (1.15.0)
     mustermann (3.0.3)
       ruby2_keywords (~> 0.0.1)
+    nio4r (2.7.4)
     pry (0.15.0)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    puma (6.5.0)
+      nio4r (~> 2.0)
     rack (3.1.8)
     rack-protection (4.1.1)
       base64 (>= 0.1.0)
@@ -43,6 +46,7 @@ PLATFORMS
 DEPENDENCIES
   erubis
   pry
+  puma
   sinatra
   sinatra-contrib
   webrick

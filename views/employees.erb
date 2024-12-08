@@ -1,0 +1,8 @@
+<%# views/employees.erb %>
+<h2>Employees:</h2>
+<ul>
+  <% @employees.each do |employee| %>
+    <li><%= name_and_title(employee) %></li>
+  <% end %>
+</ul>
+
