@@ -132,12 +132,22 @@ post '/lists/:list_id/todos' do
     @list[:todos] << { name: todo, completed: false }
 
     session[:success] = 'To-do successfully added.'
-    redirect back
-  end  
+    redirect "/lists/#{@list_id}"
+  end
 end
 
-# When you add a new empty todo, the error directs to /lists/:list_id/todos
-
+# BUG:
+# To Reproduce:
+# 1) Add a new empty todo -> trip validation error; URL changes to lists/list_id/todos
+# 2) Add a valid todo item 
+# -> A GET request to /lists/list id/todos is submitted.
+# 
+# WHy?
+# 1) New empty todo is added -> POST /lists/list_id/todos
+# 2) Validation error is tripped, list re-renders
+# 3) Valid todo is added 
+# 4) Happy path, redirect back -> GET lists/list_id/todos 
+# 5) does not exist -> 404 
 
 # Delete a to-do from a list
 post '/lists/:list_id/todos/:todo_id/delete' do
