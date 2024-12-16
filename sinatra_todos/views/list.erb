@@ -2,12 +2,22 @@
   <a class="list" href="/lists">Back to Home</a>
 <% end %>
 
-<section id="todos">
+<% completed = all_todos_completed?(@list) %>
+
+<section id="todos" class=<%= 'complete' if completed %>>
   <header>
     <h2><%= @list[:name] %></h2>
     <ul>
+      <% unless completed %>
+        <li>
+          <form action="/lists/<%= @list_id %>/complete_all" method="post">
+            <button class="check" type="submit">Complete All</button>
+          </form>
+        </li>
+      <% end %>
+
       <li>
-        <a class="edit" href=<%= "/lists/#{params[:id]}/edit"%>>
+        <a class="edit" href=<%= "/lists/#{@list_id}/edit"%>>
           Edit List
         </a>
       </li>

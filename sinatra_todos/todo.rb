@@ -16,11 +16,19 @@ before do
   session[:lists] ||= []
 end
 
+helpers do
+  def all_todos_completed?(list)
+    list[:todos].all? { |todo| todo[:completed] }
+  end
+end
+
 get '/' do
   redirect '/lists'
 end
 
-# Lists
+# # # # #
+# Lists #
+# # # # #
 # View all lists
 get '/lists' do
   @lists = session[:lists]
@@ -48,7 +56,7 @@ post '/lists' do
   end
 end
 
-# Display a specific list object
+# Display a specific List
 get '/lists/:id' do
   redirect '/lists' unless valid_list_id?(params[:id])
 
@@ -95,8 +103,10 @@ post '/lists/:id/delete' do
   redirect '/lists'
 end
 
-# To-Dos
-# Add a new to-do to a list
+# # # # # #  
+#  To-Dos #
+# # # # # #
+# Create a new to-do on a list
 post '/lists/:list_id/todos' do
   @list_id = params[:list_id].to_i
   @list = session[:lists][@list_id]
@@ -134,6 +144,16 @@ post '/lists/:list_id/todos/:todo_id/toggle' do
 
   todo[:completed] = true?(params[:completed])
   session[:success] = 'To-do successfully updated.'
+  redirect back
+end
+
+# Mark all to-dos as complete
+post '/lists/:id/complete_all' do
+  list_id = params[:id].to_i
+  list = session[:lists][list_id]
+
+  list[:todos].each { |todo| todo[:completed] = true }
+  session[:success] = 'List successfully completed.'
   redirect back
 end
 
