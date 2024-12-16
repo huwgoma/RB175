@@ -17,8 +17,20 @@ before do
 end
 
 helpers do
-  def all_todos_completed?(list)
-    list[:todos].all? { |todo| todo[:completed] }
+  def list_complete?(list)
+    list[:todos].any? && list[:todos].all? { |todo| todo[:completed] }
+  end
+
+  def list_incomplete?(list)
+    list[:todos].any? { |todo| todo[:completed] == false }
+  end
+
+  def todo_count(list)
+    list[:todos].size
+  end
+
+  def remaining_todo_count(list)
+    list[:todos].count { |todo| !todo[:completed] }
   end
 end
 
