@@ -83,7 +83,6 @@ get '/lists/:id/edit' do
   redirect '/lists' unless valid_list_id?(params[:id])
 
   @list_id = params[:id].to_i
-
   @list = session[:lists][@list_id]
 
   erb :edit_list
@@ -99,7 +98,7 @@ post '/lists/:id' do
   session[:error] = list_name_error(list_name)
 
   if session[:error]
-    erb :list
+    erb :edit_list
   else
     @list[:name] = list_name
     session[:success] = 'List successfully updated.'
@@ -136,6 +135,9 @@ post '/lists/:list_id/todos' do
     redirect back
   end  
 end
+
+# When you add a new empty todo, the error directs to /lists/:list_id/todos
+
 
 # Delete a to-do from a list
 post '/lists/:list_id/todos/:todo_id/delete' do
