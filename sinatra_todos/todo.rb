@@ -18,7 +18,7 @@ end
 
 helpers do
   def list_complete?(list)
-    list[:todos].any? && list[:todos].all? { |todo| todo[:completed] }
+    todo_count(list).positive? && remaining_todo_count(list).zero?
   end
 
   def list_incomplete?(list)
