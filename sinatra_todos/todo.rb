@@ -117,17 +117,52 @@ end
 
 # Delete a to-do from a list
 post '/lists/:list_id/todos/:todo_id/delete' do
-  @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
+  list_id = params[:list_id].to_i
+  list = session[:lists][list_id]
 
-  @list[:todos].delete_at(params[:todo_id].to_i)
+  list[:todos].delete_at(params[:todo_id].to_i)
   session[:success] = 'To-do successfully deleted.'
-  redirect "/lists/#{@list_id}"
+  redirect "/lists/#{list_id}"
 end
 
+post '/lists/:list_id/todos/:todo_id/complete' do
+  list_id = params[:list_id].to_i
+  todo_id = params[:todo_id].to_i
+
+  list = session[:lists][list_id]
+  todo = list[:todos][todo_id]
+
+  todo[:completed] = !todo[:completed]
+  session[:success] = 'To-do successfully updated.'
+  redirect "/lists/#{list_id}"
+end
+# Mark a to-do as complete 
+#
+# To-do data : { name: name, completed: false }
+#
+# 
 # What action should the complete form post to?
+#   - post (submitting a request that will modify data)
+#   - action= 'lists/:list_id/todos/:todo_id/complete'
 # Is there a value to pass?
+#   - dont think so? (list id and todo id are being passed via URL)
 # Handle the form submission and mark the todo as completed
+# 
+#
+# Back
+# - Retrieve the list at list_id
+# - Retrieve the list's todos 
+# - Retrieve the todo at todo_id
+# 
+# - Invert the todo's completed status (false -> true and true -> false)
+# - Redirect to the same list at list_id
+
+# Front
+# - When displaying each todo <li>:
+#   - If the current todo is completed, add a class="complete" to <li>
+#   - Otherwise, don't add any class 
+
+
 # - If completed, mark the <li> element as "complete"
 # Make sure the user can uncheck an item too to uncomplete it
 
