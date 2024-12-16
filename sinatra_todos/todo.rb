@@ -111,7 +111,7 @@ post '/lists/:list_id/todos' do
     @list[:todos] << { name: todo, completed: false }
 
     session[:success] = 'To-do successfully added.'
-    redirect "/lists/#{@list_id}"
+    redirect back
   end  
 end
 
@@ -122,11 +122,11 @@ post '/lists/:list_id/todos/:todo_id/delete' do
 
   list[:todos].delete_at(params[:todo_id].to_i)
   session[:success] = 'To-do successfully deleted.'
-  redirect "/lists/#{list_id}"
+  redirect back
 end
 
-# Mark a specific to-do as complete
-post '/lists/:list_id/todos/:todo_id/complete' do
+# Mark a specific to-do as complete or incomplete
+post '/lists/:list_id/todos/:todo_id/toggle' do
   list_id = params[:list_id].to_i
   todo_id = params[:todo_id].to_i
   list = session[:lists][list_id]
@@ -134,10 +134,12 @@ post '/lists/:list_id/todos/:todo_id/complete' do
 
   todo[:completed] = true?(params[:completed])
   session[:success] = 'To-do successfully updated.'
-  redirect "/lists/#{list_id}"
+  redirect back
 end
 
-# Helpers
+# # # # # #
+# Helpers # 
+# # # # # #
 def valid_list_id?(id)
   integer?(id) && session[:lists].fetch(id.to_i, false)
 end
