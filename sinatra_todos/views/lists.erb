@@ -3,15 +3,54 @@
 <% end %>
 
 <ul id="lists">
+  <%# Incomplete Lists %>
   <% @lists.each_with_index do |list, index| %>
-    <li class=<%= 'complete' if list_complete?(list) %>>
-      <a href=<%= "/lists/#{index}"%>>
-        <h2><%= list[:name] %></h2>
-        <p>
-          <%= remaining_todo_count(list) %>/<%= todo_count(list) %>
-        </p>
-      </a>
-    </li>
+    <% if list_incomplete?(list) %>
+      <li>
+        <a href="/lists/<%= index %>">
+          <h2><%= list[:name] %></h2>
+          <p>
+            <%= remaining_todo_count(list) %>/<%= todo_count(list) %>
+          </p>
+        </a>
+      </li>
+    <% end %>
   <% end %>
+
+  <%# Complete Lists %>
+  <% @lists.each_with_index do |list, index| %>
+    <% if list_complete?(list) %>
+      <li class='complete'>
+        <a href="/lists/<%= index%>">
+          <h2><%= list[:name] %></h2>
+          <p>
+            <%= remaining_todo_count(list) %>/<%= todo_count(list) %>
+          </p>
+        </a>
+      </li>
+    <% end %>
+  <% end %>
+  <%# Refactor complete/incomplete logic ? %>
+  <%# Iterate through @lists
+  # Partition + map list indexes into incomplete/complete and combine 
+  # Iterate through the partitioned list indexes 
+  # - Retrieve and display the corresponding list from @lists
+  #  %>
 </ul>
 
+<%# # Sorting Lists
+# Input: an array of @lists [ { name: name, todos: [] }, ...]
+#   - Cannot change the order of @lists
+# Output: Completed lists are displayed below incomplete lists
+# 
+# Data: 
+# - @lists = array of Hashes, each Hash represents a 'list'
+# - Cannot change @lists' inherent order because we still use their order (index)
+#   to access them correctly in hyperlinks
+# COULD TRY:
+# - Iterate through @lists twice, once to display incomplete lists, once to display 
+#   complete lists.
+# eg. @lists.each w/ index { display list unless list_complete?(list) }
+#     @lists.each w/ index { display list if list_complete?(list) }
+
+%>

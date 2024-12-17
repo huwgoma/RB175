@@ -17,6 +17,16 @@ before do
 end
 
 helpers do
+  # Counts
+  def todo_count(list)
+    list[:todos].size
+  end
+
+  def remaining_todo_count(list)
+    list[:todos].count { |todo| !todo[:completed] }
+  end
+
+  # Complete/Incomplete
   def list_complete?(list)
     todo_count(list).positive? && remaining_todo_count(list).zero?
   end
@@ -25,13 +35,7 @@ helpers do
     list[:todos].any? { |todo| todo[:completed] == false }
   end
 
-  def todo_count(list)
-    list[:todos].size
-  end
 
-  def remaining_todo_count(list)
-    list[:todos].count { |todo| !todo[:completed] }
-  end
 end
 
 get '/' do
@@ -136,19 +140,6 @@ post '/lists/:list_id/todos' do
   end
 end
 
-# BUG:
-# To Reproduce:
-# 1) Add a new empty todo -> trip validation error; URL changes to lists/list_id/todos
-# 2) Add a valid todo item 
-# -> A GET request to /lists/list id/todos is submitted.
-# 
-# WHy?
-# 1) New empty todo is added -> POST /lists/list_id/todos
-# 2) Validation error is tripped, list re-renders
-# 3) Valid todo is added 
-# 4) Happy path, redirect back -> GET lists/list_id/todos 
-# 5) does not exist -> 404 
-
 # Delete a to-do from a list
 post '/lists/:list_id/todos/:todo_id/delete' do
   list_id = params[:list_id].to_i
@@ -213,25 +204,6 @@ def todo_error(name)
   end
 end
 
-
-
-
-
-
-# Multiple List
-# Each List has multiple todos (show # of incomplete tasks in each list)
-# ( Sort alphabetically )
-# - Add todos to each list
-# - mark as completed (goes to bottom)
-# - mark as uncompleted
-# - Complete all (cross out list name to show its done)
-# - edit list (change name of list)
-# - delete item
-#
-# Lists are represented by URL IDs
-#
-# Errors/Validation:
-# - Disallow empty todos
-# - Disallow empty list names
-# - Disallow invalid URL list IDs -> redirect to homepage w/ error msg
-#
+# Sorting/Filtering
+# - Place completed items at the bottom
+# - Items of the same completion status should be 
