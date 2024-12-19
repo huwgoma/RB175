@@ -27,6 +27,8 @@ helpers do
   end
 
   # Complete/Incomplete
+  # # Is an empty list complete or incomplete?
+  # - Neither, so make a third method for the empty case
   def list_complete?(list)
     todo_count(list).positive? && remaining_todo_count(list).zero?
   end
@@ -35,6 +37,22 @@ helpers do
     list[:todos].any? { |todo| todo[:completed] == false }
   end
 
+  # Display Order
+  # - Sort all lists by completion
+  def sort_lists(lists)
+    partition = { complete: [], incomplete: [] }
+
+    lists.each_with_index do |list, index|
+      completion_status = list_complete?(list) ? :complete : :incomplete
+      partition[completion_status] << index
+    end
+
+    (partition[:incomplete] + partition[:complete]).each do |index|
+      yield(lists[index], index)
+    end
+  end
+
+  # - Sort to-dos by completion
 
 end
 
