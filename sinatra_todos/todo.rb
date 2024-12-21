@@ -52,34 +52,15 @@ helpers do
   def sort_lists(lists, &block)
     ordered_lists = order_by_completion(lists) { |list| list_complete?(list) }
 
-    ordered_lists.each do |list|
-      yield(list[:element], list[:index])
-    end
+    ordered_lists.each { |list| yield(list[:element], list[:index]) }
   end
 
-  # - Sort to-dos by completion
-  # def sort_todos(todos)
-  #   partition = { complete: [], incomplete: [] }
-
-  #   todos.each_with_index do |todo, index|
-  #     completion_status = todo[:completed] ? :complete : :incomplete
-  #     partition[completion_status] << index
-  #   end
-
-  #   (partition[:incomplete] + partition[:complete]).each do |index|
-  #     yield(todos[index], index)
-  #   end
-  # end
-
-
-
+  def sort_todos(todos, &block)
+    ordered_todos = order_by_completion(todos) { |todo| todo[:completed] }
+    
+    ordered_todos.each { |todo| yield(todo[:element], todo[:index]) }
+  end
 end
-
-##############
-
-
-
-
 
 get '/' do
   redirect '/lists'
