@@ -37,24 +37,49 @@ helpers do
     list[:todos].any? { |todo| todo[:completed] == false }
   end
 
-  # Display Order
-  # - Sort all lists by completion
-  def sort_lists(lists)
+  # Order Lists/To-Dos by Completion Status
+  def order_by_completion(elements, &criteria)
     partition = { complete: [], incomplete: [] }
 
-    lists.each_with_index do |list, index|
-      completion_status = list_complete?(list) ? :complete : :incomplete
-      partition[completion_status] << index
+    elements.each_with_index do |element, index|
+      status = criteria.call(element) ? :complete : :incomplete
+      partition[status] << { element: element, index: index }
     end
 
-    (partition[:incomplete] + partition[:complete]).each do |index|
-      yield(lists[index], index)
+    partition[:incomplete] + partition[:complete]
+  end
+
+  def sort_lists(lists, &block)
+    ordered_lists = order_by_completion(lists) { |list| list_complete?(list) }
+
+    ordered_lists.each do |list|
+      yield(list[:element], list[:index])
     end
   end
 
   # - Sort to-dos by completion
+  # def sort_todos(todos)
+  #   partition = { complete: [], incomplete: [] }
+
+  #   todos.each_with_index do |todo, index|
+  #     completion_status = todo[:completed] ? :complete : :incomplete
+  #     partition[completion_status] << index
+  #   end
+
+  #   (partition[:incomplete] + partition[:complete]).each do |index|
+  #     yield(todos[index], index)
+  #   end
+  # end
+
+
 
 end
+
+##############
+
+
+
+
 
 get '/' do
   redirect '/lists'
