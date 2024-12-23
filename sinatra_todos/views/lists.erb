@@ -3,14 +3,15 @@
 <% end %>
 
 <ul id="lists">
-  <% sort_lists(@lists) do |list, index| %>    
-    <li class=<%= 'complete' if list_complete?(list) %>>
+  <% sort_lists(@lists) do |list, index| %>
+    <li class="<%= list_completion(list)%>">
       <a href="/lists/<%= index %>">
         <h2><%= list[:name] %></h2>
         <p>
           <%= remaining_todo_count(list) %>/<%= todo_count(list) %>
         </p>
       </a>
+    </li>
     </li>
   <% end %>
 </ul>

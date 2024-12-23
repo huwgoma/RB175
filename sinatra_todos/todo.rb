@@ -9,8 +9,9 @@ require 'pry'
 
 configure do
   enable :sessions
-
   set :session_secret, SecureRandom.hex(32)
+
+  set :erb, :escape_html => true
 end
 
 before do
@@ -28,8 +29,14 @@ helpers do
   end
 
   # Complete/Incomplete
-  # # Is an empty list complete or incomplete?
-  # - Neither, so make a third method for the empty case
+  def list_completion(list)
+    'complete' if list_complete?(list)
+  end
+
+  def todo_completion(todo)
+    'complete' if todo[:completed]
+  end
+
   def list_complete?(list)
     todo_count(list).positive? && remaining_todo_count(list).zero?
   end
@@ -37,6 +44,8 @@ helpers do
   def list_incomplete?(list)
     list[:todos].any? { |todo| todo[:completed] == false }
   end
+  # # Is an empty list complete or incomplete?
+  # - Neither, so make a third method for the empty case
 
   # Order Lists/To-Dos by Completion Status
   def order_by_completion(elements, &criteria)
@@ -228,7 +237,3 @@ def todo_error(name)
     'To-do name must be 1-100 characters.'
   end
 end
-
-# Sorting/Filtering
-# - Place completed items at the bottom
-# - Items of the same completion status should be 

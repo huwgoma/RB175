@@ -2,7 +2,7 @@
   <a class="list" href="/lists">Back to Home</a>
 <% end %>
 
-<section id="todos" class=<%= 'complete' if list_complete?(@list) %>>
+<section id="todos" class="<%= list_completion(@list) %>">
   <header>
     <h2><%= @list[:name] %></h2>
     <ul>
@@ -24,7 +24,7 @@
 
   <ul>
     <% sort_todos(@list[:todos]) do |todo, index| %>
-      <li class=<%= 'complete' if todo[:completed] %>>
+      <li class="<%= todo_completion(todo) %>">
         <form action="/lists/<%= @list_id %>/todos/<%= index %>/toggle" method="post" class="check">
           <input type="hidden" name="completed" value="<%= !todo[:completed] %>"/>
           <button type="submit">Complete</button>

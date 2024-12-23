@@ -12,8 +12,6 @@ get '/users/new' do
   erb :new_user_form
 end
 
-# app.rb
-
 # Create a new user
 post '/users' do
   # ...
