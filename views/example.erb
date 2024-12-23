@@ -1,3 +1,30 @@
+<%# views/lists.erb %>
+<% content_for :header do %>
+  <a href="/lists/new">New List</a>
+<% end %>
+
+<ul>
+  <% @lists.each do |list| %>
+    <li><%= list.name %></li>
+  <% %>
+</ul>
+
+<%# views/list.erb %>
+<% content_for :header do %>
+  <a href="/lists">View All Lists</a>
+<% end %>
+
+<h3><%= @list.name %></h3>
+<ul>
+  <% @list.todos.each do |todo| %>
+    <li><%= todo.name %></li>
+  <% end %>
+</ul>
+
+<ul>
+  <%= @list.name %>
+</ul>
+ 
 <h3><%= @user.name %>'s Profile: </h3>
 
 <p>Name: <%= @user.name %></p>

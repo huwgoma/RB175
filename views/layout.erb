@@ -1,8 +1,27 @@
 <%# views/layout.erb %>
+  <header>
+    <div><%= yield_content :header %></div>
+  </header>
+
+  <%# ...  %>
+
+  <main>
+    <%= yield %>
+  </main>
+
+
 <html>
   <body>
+    <header>
+      <h1>Title</h1>
+      <div><%= yield_content :header_links %></div>
+    </header>
     <h1>Company Name:</h1>
-    <%= yield %>
+
+    <main>
+      <%= yield %>
+    </main>
+    
   </body>
 </html>
 
