@@ -108,31 +108,25 @@ end
 
 # Display a specific List
 get '/lists/:id' do
-  redirect '/lists' unless valid_list_id?(params[:id])
-
+  @list = load_list(params[:id])
   @list_id = params[:id].to_i
-  @list = session[:lists][@list_id]
-  
   erb :list
 end
 
 # Form for editing existing list
 get '/lists/:id/edit' do
-  redirect '/lists' unless valid_list_id?(params[:id])
-
+  @list = load_list(params[:id])
   @list_id = params[:id].to_i
-  @list = session[:lists][@list_id]
 
   erb :edit_list
 end
 
 # Update existing list
 post '/lists/:id' do
+  @list = load_list(params[:id])
   @list_id = params[:id].to_i
-  @list = session[:lists][@list_id]
 
   list_name = params[:list_name].strip
-  
   session[:error] = list_name_error(list_name)
 
   if session[:error]
@@ -157,11 +151,10 @@ end
 # # # # # #
 # Create a new to-do on a list
 post '/lists/:list_id/todos' do
+  @list = load_list(params[:list_id])
   @list_id = params[:list_id].to_i
-  @list = session[:lists][@list_id]
 
   todo = params[:todo].strip
-
   session[:error] = todo_error(todo)
 
   if session[:error]
@@ -176,41 +169,46 @@ end
 
 # Delete a to-do from a list
 post '/lists/:list_id/todos/:todo_id/delete' do
+  list = load_list(params[:list_id])
   list_id = params[:list_id].to_i
-  list = session[:lists][list_id]
 
   list[:todos].delete_at(params[:todo_id].to_i)
   session[:success] = 'To-do successfully deleted.'
-  redirect back
+  redirect "lists/#{list_id}"
 end
 
 # Mark a specific to-do as complete or incomplete
 post '/lists/:list_id/todos/:todo_id/toggle' do
-  list_id = params[:list_id].to_i
+  list = load_list(params[:list_id])
+  list_id = params[:id].to_i
+
   todo_id = params[:todo_id].to_i
-  list = session[:lists][list_id]
   todo = list[:todos][todo_id]
 
   todo[:completed] = true?(params[:completed])
   session[:success] = 'To-do successfully updated.'
-  redirect back
+  redirect "/lists/#{list_id}"
 end
 
 # Mark all to-dos as complete
 post '/lists/:id/complete_all' do
+  list = load_list(params[:id])
   list_id = params[:id].to_i
-  list = session[:lists][list_id]
 
   list[:todos].each { |todo| todo[:completed] = true }
   session[:success] = 'List successfully completed.'
-  redirect back
+  redirect "/lists/#{list_id}"
 end
 
 # # # # # #
 # Helpers # 
 # # # # # #
-def valid_list_id?(id)
-  integer?(id) && session[:lists].fetch(id.to_i, false)
+def load_list(id)
+  list = integer?(id) && session[:lists][id.to_i]
+  return list if list
+
+  session[:error] = 'That list could not be found.'
+  redirect '/lists'
 end
 
 def integer?(string)
