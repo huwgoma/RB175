@@ -180,7 +180,7 @@ end
 # Mark a specific to-do as complete or incomplete
 post '/lists/:list_id/todos/:todo_id/toggle' do
   list = load_list(params[:list_id])
-  list_id = params[:id].to_i
+  list_id = params[:list_id].to_i
 
   todo_id = params[:todo_id].to_i
   todo = list[:todos][todo_id]
