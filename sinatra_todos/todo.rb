@@ -67,9 +67,8 @@ helpers do
 
   def sort_todos(todos, &block)
     ordered_todos = order_by_completion(todos) { |todo| todo[:completed] }
-    
-    # Dont need index anymore
-    ordered_todos.each { |todo| yield(todo[:element], todo[:index]) }
+
+    ordered_todos.each { |todo| yield(todo[:element]) }
   end
 end
 
