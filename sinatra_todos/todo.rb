@@ -68,6 +68,7 @@ helpers do
   def sort_todos(todos, &block)
     ordered_todos = order_by_completion(todos) { |todo| todo[:completed] }
     
+    # Dont need index anymore
     ordered_todos.each { |todo| yield(todo[:element], todo[:index]) }
   end
 end
@@ -141,9 +142,15 @@ end
 # Delete a list
 post '/lists/:id/delete' do
   session[:lists].delete_at(params[:id].to_i)
-  session[:success] = 'List successfully deleted.'
 
-  redirect '/lists'
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    "/lists"
+  else
+    session[:success] = 'List successfully deleted.'
+
+    redirect '/lists'
+  end
+  
 end
 
 # # # # # #  
@@ -160,7 +167,8 @@ post '/lists/:list_id/todos' do
   if session[:error]
     erb :list
   else
-    @list[:todos] << { name: todo, completed: false }
+    id = next_todo_id(@list[:todos])
+    @list[:todos] << { id: id, name: todo, completed: false }
 
     session[:success] = 'To-do successfully added.'
     redirect "/lists/#{@list_id}"
@@ -171,10 +179,18 @@ end
 post '/lists/:list_id/todos/:todo_id/delete' do
   list = load_list(params[:list_id])
   list_id = params[:list_id].to_i
+  todo_id = params[:todo_id].to_i
 
-  list[:todos].delete_at(params[:todo_id].to_i)
-  session[:success] = 'To-do successfully deleted.'
-  redirect "lists/#{list_id}"
+  list[:todos].delete_if { |todo| todo[:id] == todo_id }
+
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    #ajax
+    status 204 # no content
+  else
+    session[:success] = 'To-do successfully deleted.'
+    redirect "lists/#{list_id}"
+  end
+  
 end
 
 # Mark a specific to-do as complete or incomplete
@@ -183,7 +199,7 @@ post '/lists/:list_id/todos/:todo_id/toggle' do
   list_id = params[:list_id].to_i
 
   todo_id = params[:todo_id].to_i
-  todo = list[:todos][todo_id]
+  todo = list[:todos].find { |todo| todo[:id] == todo_id }
 
   todo[:completed] = true?(params[:completed])
   session[:success] = 'To-do successfully updated.'
@@ -219,6 +235,12 @@ def true?(obj)
   obj.to_s == 'true'
 end
 
+def next_todo_id(todos)
+  return 0 if todos.empty?
+
+  todos.map { |todo| todo[:id] }.max + 1
+end
+
 # Validate names (list/todos) 
 # - Return a custom error string if name is invalid, or nil
 #   if the name is valid.
@@ -235,3 +257,4 @@ def todo_error(name)
     'To-do name must be 1-100 characters.'
   end
 end
+
