@@ -1,0 +1,16 @@
+
+[1mFrom:[0m /home/hugo/launch_school/RB175/sinatra_todos/todo.rb:52 Sinatra::Application#order_by_completion:
+
+    [1;34m51[0m: [32mdef[0m [1;34morder_by_completion[0m(elements, &criteria)
+ => [1;34m52[0m:   binding.pry
+    [1;34m53[0m: 
+    [1;34m54[0m:   partition = { [35mcomplete[0m: [], [35mincomplete[0m: [] }
+    [1;34m55[0m: 
+    [1;34m56[0m:   elements.each_with_index [32mdo[0m |element, index|
+    [1;34m57[0m:     status = criteria.call(element) ? [33m:complete[0m : [33m:incomplete[0m
+    [1;34m58[0m:     partition[status] << { [35melement[0m: element, [35mindex[0m: index }
+    [1;34m59[0m:   [32mend[0m
+    [1;34m60[0m: 
+    [1;34m61[0m:   partition[[33m:incomplete[0m] + partition[[33m:complete[0m]
+    [1;34m62[0m: [32mend[0m
+

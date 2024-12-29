@@ -49,27 +49,18 @@ helpers do
 
   # Order Lists/To-Dos by Completion Status
   def order_by_completion(elements, &criteria)
-    partition = { complete: [], incomplete: [] }
-
-    elements.each_with_index do |element, index|
-      status = criteria.call(element) ? :complete : :incomplete
-      partition[status] << { element: element, index: index }
-    end
-
-    partition[:incomplete] + partition[:complete]
+    complete, incomplete = elements.partition { |element| criteria.call(element) }
+    incomplete + complete
   end
 
   def sort_lists(lists, &block)
     ordered_lists = order_by_completion(lists) { |list| list_complete?(list) }
-
-    ordered_lists.each { |list| yield(list[:element], list[:index]) }
+    ordered_lists.each { |list| yield(list) }
   end
 
   def sort_todos(todos, &block)
     ordered_todos = order_by_completion(todos) { |todo| todo[:completed] }
-    
-    # Dont need index anymore
-    ordered_todos.each { |todo| yield(todo[:element], todo[:index]) }
+    ordered_todos.each { |todo| yield(todo) }
   end
 end
 
