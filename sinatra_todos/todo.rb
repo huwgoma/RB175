@@ -101,7 +101,8 @@ post '/lists' do
   if session[:error]
     erb :new_list
   else
-    session[:lists] << { name: list_name, todos: [] }
+    id = next_element_id(session[:lists])
+    session[:lists] << { id: id, name: list_name, todos: [] }
     session[:success] = 'List successfully created.'
     redirect '/lists'
   end
@@ -110,7 +111,11 @@ end
 # Display a specific List
 get '/lists/:id' do
   @list = load_list(params[:id])
+  
   @list_id = params[:id].to_i
+  @list_name = @list[:name]
+  @todos = @list[:todos]
+
   erb :list
 end
 
@@ -141,7 +146,8 @@ end
 
 # Delete a list
 post '/lists/:id/delete' do
-  session[:lists].delete_at(params[:id].to_i)
+  list_id = params[:id].to_i
+  session[:lists].delete_if { |list| list[:id] == list_id }
 
   if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
     "/lists"
@@ -167,7 +173,7 @@ post '/lists/:list_id/todos' do
   if session[:error]
     erb :list
   else
-    id = next_todo_id(@list[:todos])
+    id = next_element_id(@list[:todos])
     @list[:todos] << { id: id, name: todo, completed: false }
 
     session[:success] = 'To-do successfully added.'
@@ -220,7 +226,7 @@ end
 # Helpers # 
 # # # # # #
 def load_list(id)
-  list = integer?(id) && session[:lists][id.to_i]
+  list = integer?(id) && session[:lists].find { |list| list[:id] == id.to_i }
   return list if list
 
   session[:error] = 'That list could not be found.'
@@ -235,10 +241,11 @@ def true?(obj)
   obj.to_s == 'true'
 end
 
-def next_todo_id(todos)
-  return 0 if todos.empty?
-
-  todos.map { |todo| todo[:id] }.max + 1
+# List and To-Do IDs
+def next_element_id(elements)
+  return 0 if elements.empty?
+  
+  elements.map { |element| element[:id] }.max + 1
 end
 
 # Validate names (list/todos) 
