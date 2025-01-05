@@ -10,16 +10,8 @@ before do
 end
 
 get '/' do
-  @filenames = Dir.children('data')
-
+  app_root = File.expand_path("..", __FILE__)
+  @file_names = Dir.children("#{app_root}/data")
+  
   erb :files
-  
-  # List all files in the CMS:
-  # history.txt, changes.txt, about.txt
-  # 1) Create files - where? ( data?)
-  # 2) Create views (views/layout.erb, views/files.erb)
-  # 3) - Load all filenames from data/ into @filenamess
-  # 4) Render files.erb
-  # # - Iterate through @files and create a <li> for each
-  
 end
