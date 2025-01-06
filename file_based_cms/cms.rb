@@ -27,21 +27,16 @@ get '/:file_name' do
   file_name = params[:file_name]
   file_path = "#{@root}/data/#{file_name}"
   
-  if File.exist?(file_path)
-    headers['Content-Type'] = file_type(file_path)
-    load_file(file_path)
-  else
-    session[:message] = "#{file_name} does not exist."
-    redirect '/' 
-  end
+  headers['Content-Type'] = cont_type(file_path)
+  load_file(file_path)
 end
 
 # Retrieve the form page for editing a file
 get '/:file_name/edit' do
   @file_name = params[:file_name]
   file_path = "#{@root}/data/#{@file_name}"
-
-  @file = File.read(file_path)
+  
+  @file = load_file(file_path)
 
   erb :edit_file
 end
@@ -63,6 +58,15 @@ end
 # Helpers #
 # # # # # #
 def load_file(path)
+  if File.exist?(path)
+    format_file(path)
+  else
+    session[:message] = "#{File.basename(path)} does not exist."
+    redirect '/'
+  end
+end
+
+def format_file(path)
   file = File.read(path)
 
   case File.extname(path)
@@ -73,7 +77,7 @@ def load_file(path)
   end
 end
 
-def file_type(path)
+def cont_type(path)
   case File.extname(path)
   when '.txt'
     'text/plain'

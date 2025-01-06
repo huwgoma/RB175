@@ -1,12 +1,16 @@
-# README.md
+<h1>README.md</h1>
 
-**This is bold text**
+<p><strong>This is bold text</strong></p>
 
-*This is italicized text*
+<p><em>This is italicized text</em></p>
 
->This is a blockquote
+<blockquote>
+<p>This is a blockquote</p>
+</blockquote>
 
-- Unordered List Item 1
-- Unordered List Item 2
+<ul>
+<li>Unordered List Item 1</li>
+<li>Unordered List Item 2</li>
+</ul>
 
-I'm editing this!
+Goodbye
