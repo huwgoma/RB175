@@ -25,7 +25,7 @@ class AppTest < Minitest::Test
     file_names.each { |name| assert_includes(last_response.body, name) }
   end
 
-  def test_viewing_file
+  def test_view_file
     get '/history.txt'
 
     latest_release = "2022 - Ruby 3.2 released."
@@ -35,5 +35,19 @@ class AppTest < Minitest::Test
     assert_includes(last_response.body, latest_release)
   end
 
+  def test_view_nonexistent_file
+    bad_file = 'bad_file.txt'
+    
+    get "/#{bad_file}"
+    assert_equal(302, last_response.status)
+
+    get last_response['Location']
+    assert_equal(200, last_response.status)
+    assert_includes(last_response.body, "#{bad_file} does not exist.")
+
+    # Reload
+    get '/'
+    refute_includes(last_response.body, "#{bad_file} does not exist.")
+  end
 end
 

@@ -4,6 +4,10 @@
   </head>
   
   <main>
+    <% if session[:error] %>
+      <div><%= session.delete(:error) %></div>
+    <% end %>
+    
     <%= yield %>
   </main>
 </html>
