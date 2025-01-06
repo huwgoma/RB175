@@ -21,6 +21,4 @@ get '/:file_name' do
   
   headers['Content-Type'] = 'text/plain'
   @file = File.read(file_path)
-  # Render contents of file
-  # (Direct serving? - only for public?)
 end
