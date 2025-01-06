@@ -4,8 +4,8 @@
   </head>
   
   <main>
-    <% if session[:error] %>
-      <div><%= session.delete(:error) %></div>
+    <% if session[:message] %>
+      <div><%= session.delete(:message) %></div>
     <% end %>
     
     <%= yield %>
