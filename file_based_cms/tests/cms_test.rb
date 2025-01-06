@@ -18,7 +18,7 @@ class AppTest < Minitest::Test
   def test_index
     get '/'
 
-    file_names = ["about.txt", "changes.txt", "history.txt"]
+    file_names = ["about.md", "changes.txt", "history.txt"]
 
     assert_equal(200, last_response.status)
     assert_equal('text/html;charset=utf-8', last_response['Content-Type'])
@@ -48,6 +48,15 @@ class AppTest < Minitest::Test
     # Reload
     get '/'
     refute_includes(last_response.body, "#{bad_file} does not exist.")
+  end
+
+  def test_markdown_render
+    md_file = 'about.md'
+
+    get "/#{md_file}"
+
+    assert_equal(200, last_response.status)
+    assert_includes(last_response.body, "<h1>README.md</h1>")
   end
 end
 
