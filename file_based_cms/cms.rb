@@ -27,17 +27,32 @@ get '/' do
   erb :files
 end
 
-# Adding global styles and behavior
-# - When displaying a flash message, give the message a yellow background
-#   - Add class flash to :message div
-#   - Apply background-color: yellow to flash
-# - flash messages should still disappear after reloading
-# - text files should continue to be displayed as text/plain
-# - the entire site (including .md files) should be displayed in sans-serif font
-#   - font-family sans-serif
-# - also add a little padding around the outside
+# Form to create new files 
+get '/new' do
+  erb :new_file
+end
 
-
+# Create a new file
+post '/new' do
+  
+end
+# New Document
+# 1) When the user views the index page, they should see a "new doc" link
+#   => files.erb - new doc link, links to GET '/new'
+#    
+# 2) When the user clicks on new doc, they should see a page for creating a new doc:
+#   - Add a new document => Input field => Create
+#   => GET '/new'
+# 3) Clicking Create should submit a POST request:
+#   => POST '/new'
+#     Validations:
+#     - If name is empty => "Document name cannot be blank"
+#   => Re-render: erb :new_file
+# 4) If everything is valid, create a new document
+#   => New file with the given name at data_path/
+#     - If the document does not have an extension, default to txt
+#   => Set success message.
+#   => Redirect the user to index (home) after successful creation
 
 
 # Retrieve and display a specific file

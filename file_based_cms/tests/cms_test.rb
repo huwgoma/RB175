@@ -104,6 +104,13 @@ class CMSTest < Minitest::Test
     refute_includes(last_response.body, 'changes.txt has been updated.')
   end
 
+  def test_new_file_form
+    get '/new'
+
+    assert_equal(200, last_response.status)
+    assert_includes(last_response.body, '<form action="/new" method="post">')
+  end
+
   # # # # # # 
   # Helpers #
   # # # # # #
