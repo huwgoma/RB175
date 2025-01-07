@@ -39,7 +39,7 @@ end
 # Retrieve the form page for editing a file
 get '/:file_name/edit' do
   @file_name = params[:file_name]
-  file_path = File.join(data_path, file_name)
+  file_path = File.join(data_path, @file_name)
   
   @file = load_file(file_path, format: false)
   # Escape HTML?

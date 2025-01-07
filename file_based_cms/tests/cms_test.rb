@@ -6,13 +6,18 @@ Minitest::Reporters.use!
 require 'minitest/autorun'
 require 'rack/test'
 require 'fileutils'
+require 'yaml'
+require_relative('../cms') 
 
 require 'pry'
-require_relative('../cms')
 
-class AppTest < Minitest::Test
+
+
+class CMSTest < Minitest::Test
   include Rack::Test::Methods
 
+  CONTENTS = YAML.load_file(File.expand_path("../contents.yml", data_path))
+  
   def app
     Sinatra::Application
   end
@@ -38,18 +43,16 @@ class AppTest < Minitest::Test
   end
 
   def test_view_file
-    skip
-    get '/history.txt'
+    create_document('history.txt', CONTENTS['history'])
 
-    latest_release = "2022 - Ruby 3.2 released."
+    get '/history.txt'
 
     assert_equal(200, last_response.status)
     assert_equal('text/plain', last_response['Content-Type'])
-    assert_includes(last_response.body, latest_release)
+    assert_includes(last_response.body, "2022 - Ruby 3.2 released.")
   end
 
   def test_view_nonexistent_file
-    skip
     bad_file = 'bad_file.txt'
     
     get "/#{bad_file}"
@@ -59,32 +62,33 @@ class AppTest < Minitest::Test
     assert_equal(200, last_response.status)
     assert_includes(last_response.body, "#{bad_file} does not exist.")
 
-    # Reload
+    # Message disappears upon reload
     get '/'
     refute_includes(last_response.body, "#{bad_file} does not exist.")
   end
 
   def test_markdown_render
-    skip
-    md_file = 'about.md'
+    create_document('about.md', CONTENTS['about'])
 
-    get "/#{md_file}"
+    get "/about.md"
 
     assert_equal(200, last_response.status)
     assert_includes(last_response.body, "<h1>README.md</h1>")
   end
 
   def test_file_edit_form
-    skip
+    create_document('changes.txt', CONTENTS['changes'])
+
     get '/changes.txt/edit'
 
     assert_equal(200, last_response.status)
     assert_includes(last_response.body, "<textarea")
-    assert_includes(last_response.body, '<button type="submit"')
+    assert_includes(last_response.body, 'This is a changelog.')
   end
 
   def test_file_editing
-    skip
+    create_document('changes.txt', CONTENTS['changes'])
+
     post '/changes.txt', content: "Edited Contents!"
 
     # Redirects
