@@ -30,6 +30,44 @@ class CMSTest < Minitest::Test
     FileUtils::rm_rf(data_path)
   end
 
+  def test_login_form
+    get '/users/login'
+
+    assert_equal(200, last_response.status)
+    assert_includes(last_response.body, '<form action="/users/login" method="post">')
+  end
+  
+  def test_good_login
+    post '/users/login', username: 'admin', password: 'secret'
+    
+    assert_equal(302, last_response.status)
+    
+    get last_response['Location']
+    assert_includes(last_response.body, 'Welcome!')
+    assert_includes(last_response.body, 'Signed in as admin.')
+  end
+
+  def test_bad_login
+    post '/users/login', username: 'admin', password: 'incorrect'
+
+    # Re-renders the login form
+    assert_includes(last_response.body, '<form action="/users/login" method="post">')
+    # Displays a flash message
+    assert_includes(last_response.body, 'Invalid login credentials.')
+    # Username value is autofilled
+    assert_includes(last_response.body, 'admin')
+  end
+
+  def test_logout
+    post '/users/login', username: 'admin', password: 'incorrect'
+
+    post '/users/logout'
+    assert_equal(302, last_response.status)
+    get last_response['Location']
+    
+    assert_includes(last_response.body, 'You have been logged out.')
+  end
+
   def test_index
     create_document('about.md')
     create_document('changes.txt')

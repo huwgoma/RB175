@@ -88,10 +88,6 @@ post '/users/logout' do
   redirect '/'
 end
 
-def valid_login?(username, password)
-  username == 'admin' && password == 'secret'
-end
-
 # Home Page - Display all files
 get '/' do
   @file_names = Dir.glob("#{data_path}/*").map { |path| File.basename(path) }
@@ -220,4 +216,8 @@ end
 def markdown_to_html(string)
   markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
   markdown.render(string)
+end
+
+def valid_login?(username, password)
+  username == 'admin' && password == 'secret'
 end
