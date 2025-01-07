@@ -17,7 +17,7 @@
   
 <% if logged_in? %>
   <div>
-    <p>Signed in as <%= @username %>.</p>
+    <p class="user-status">Signed in as <%= @username %>.</p>
     <form action="/users/logout" method="post">
       <button type="submit">Sign Out</button>
     </form>
