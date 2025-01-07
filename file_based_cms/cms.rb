@@ -27,6 +27,19 @@ get '/' do
   erb :files
 end
 
+# Adding global styles and behavior
+# - When displaying a flash message, give the message a yellow background
+#   - Add class flash to :message div
+#   - Apply background-color: yellow to flash
+# - flash messages should still disappear after reloading
+# - text files should continue to be displayed as text/plain
+# - the entire site (including .md files) should be displayed in sans-serif font
+#   - font-family sans-serif
+# - also add a little padding around the outside
+
+
+
+
 # Retrieve and display a specific file
 get '/:file_name' do
   file_name = params[:file_name]
@@ -86,7 +99,7 @@ def format_file(path)
   when '.txt'
     file
   when '.md'
-    markdown_to_html(file)
+    erb markdown_to_html(file)
   end
 end
 

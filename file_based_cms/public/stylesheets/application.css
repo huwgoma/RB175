@@ -1,0 +1,23 @@
+body {
+  padding: 1em;
+  font-family: sans-serif;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 { 
+  font-size: 1.6em;
+}
+
+ul {
+  list-style-type: circle;
+  padding: 10px;
+  margin-left: 10px;
+}
+
+.flash {
+  background-color: yellow;
+  padding: 10px;
+}
