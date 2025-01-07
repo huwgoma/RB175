@@ -36,8 +36,7 @@ get '/:file_name/edit' do
   @file_name = params[:file_name]
   file_path = "#{@root}/data/#{@file_name}"
   
-  @file = load_file(file_path)
-  # Load markdown as markdown not html (format = false)
+  @file = load_file(file_path, format: false)
 
   erb :edit_file
 end
@@ -58,10 +57,9 @@ end
 # # # # # # 
 # Helpers #
 # # # # # #
-def load_file(path)
+def load_file(path, format: true)
   if File.exist?(path)
-    # format = true
-    format_file(path)
+    format ? format_file(path) : File.read(path)
   else
     session[:message] = "#{File.basename(path)} does not exist."
     redirect '/'
