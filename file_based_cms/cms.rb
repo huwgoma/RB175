@@ -47,26 +47,6 @@ post '/new' do
   end
 end
 
-
-# New Document
-# 1) When the user views the index page, they should see a "new doc" link
-#   => files.erb - new doc link, links to GET '/new'
-#    
-# 2) When the user clicks on new doc, they should see a page for creating a new doc:
-#   - Add a new document => Input field => Create
-#   => GET '/new'
-# 3) Clicking Create should submit a POST request:
-#   => POST '/new'
-#     Validations:
-#     - If name is empty => "Document name cannot be blank"
-#   => Re-render: erb :new_file
-# 4) If everything is valid, create a new document
-#   => New file with the given name at data_path/
-#     - If the document does not have an extension, default to txt
-#   => Set success message.
-#   => Redirect the user to index (home) after successful creation
-
-
 # Retrieve and display a specific file
 get '/:file_name' do
   file_name = params[:file_name]
@@ -98,6 +78,21 @@ post '/:file_name' do
   session[:message] = "#{file_name} has been updated."
   redirect '/'
 end
+
+# Delete a document
+post '/:file_name/delete' do
+  file_name = params[:file_name]
+  file_path = File.join(data_path, file_name)
+  
+  File.delete(file_path)
+
+  session[:message] = "#{file_name} has been deleted."
+  redirect '/'
+end
+# 1) When the user views the home page, they should see a 'delete' button next to each
+#   file.
+# 2) When the user clicks on the delete button, the application should delete the
+# corresponding document and display a message (FILE has been deleted.)
 
 # # # # # # 
 # Helpers #
