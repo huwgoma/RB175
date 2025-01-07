@@ -34,7 +34,25 @@ end
 
 # Create a new file
 post '/new' do
-  
+  file_name = params[:file_name].strip
+
+  error = file_creation_error(file_name)
+  if error
+    session[:message] = error
+    erb :new_file
+  else
+    File.new(File.join(data_path, file_name), 'w')
+    session[:message] = "#{file_name} was created."
+    redirect '/'
+  end
+end
+
+def file_creation_error(name)
+  if name.empty?
+    'File name cannot be blank.'
+  elsif File.exist?(File.join(data_path, name))
+    'That file already exists.'
+  end
 end
 # New Document
 # 1) When the user views the index page, they should see a "new doc" link
