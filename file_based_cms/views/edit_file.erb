@@ -1,9 +1,11 @@
 <form action="/<%= @file_name %>" method="post">
   <label for="content">Editing <%= @file_name %>:</label>
 
-  <textarea name="content" id="content" rows = "10" cols = "50"><%= 
-    @file.strip 
-  %></textarea>
-
-  <input type="submit" value="Save Changes">
+  <div>
+    <textarea name="content" id="content" rows = "10" cols = "50"><%= 
+      @file.strip 
+    %></textarea>
+  </div>
+  
+  <button type="submit">Save Changes</button>
 </form>

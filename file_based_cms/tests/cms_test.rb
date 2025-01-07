@@ -58,5 +58,29 @@ class AppTest < Minitest::Test
     assert_equal(200, last_response.status)
     assert_includes(last_response.body, "<h1>README.md</h1>")
   end
+
+  def test_file_edit_form
+    get '/changes.txt/edit'
+
+    assert_equal(200, last_response.status)
+    assert_includes(last_response.body, "<textarea")
+    assert_includes(last_response.body, '<button type="submit"')
+  end
+
+  def test_file_editing
+    post '/changes.txt', content: "Edited Contents!"
+
+    # Redirects
+    assert_equal(302, last_response.status)
+    get last_response['Location']
+    # Prints message
+    assert_includes(last_response.body, 'changes.txt has been updated.')
+
+    get '/changes.txt'
+    # Contents change
+    assert_includes(last_response.body, 'Edited Contents!')
+    # Message disappears
+    refute_includes(last_response.body, 'changes.txt has been updated.')
+  end
 end
 
