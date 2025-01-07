@@ -94,10 +94,8 @@ end
 
 # Home Page - Display all files
 get '/' do
-  if logged_in?
-    @file_names = Dir.glob("#{data_path}/*").map { |path| File.basename(path) }
-    @username = session[:username]
-  end
+  @file_names = Dir.glob("#{data_path}/*").map { |path| File.basename(path) }
+  @username = session[:username]
 
   erb :index
 end
