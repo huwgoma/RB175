@@ -111,6 +111,27 @@ class CMSTest < Minitest::Test
     assert_includes(last_response.body, '<form action="/new" method="post">')
   end
 
+  def test_successful_file_creation
+    post '/new', file_name: "new_file.txt"
+    assert_equal(302, last_response.status)
+
+    get last_response['Location']
+    assert_includes(last_response.body, "new_file.txt was created.")
+    assert_includes(last_response.body, '<a href="/new_file.txt">')
+  end
+
+  def test_bad_file_creation
+    post '/new', file_name: ''
+    assert_includes(last_response.body, 'File name cannot be blank.')
+    
+    post '/new', file_name: "no_ext"
+    assert_includes(last_response.body, 'File extension cannot be blank.')
+
+    create_document('changes.txt')
+    post '/new', file_name: 'changes.txt'
+    assert_includes(last_response.body, 'That file already exists.')
+  end
+
   # # # # # # 
   # Helpers #
   # # # # # #
