@@ -12,12 +12,17 @@ configure do
 end
 
 before do
-  @root = File.expand_path("..", __FILE__)
+
 end
 
+# # # # # # 
+# Routes  #
+# # # # # # 
 # Home Page - Display all files
 get '/' do
-  @file_names = Dir.children("#{@root}/data")
+  @file_names = Dir.glob("#{data_path}/*").map do |path|
+    File.basename(path)
+  end
 
   erb :files
 end
@@ -25,7 +30,7 @@ end
 # Retrieve and display a specific file
 get '/:file_name' do
   file_name = params[:file_name]
-  file_path = "#{@root}/data/#{file_name}"
+  file_path = File.join(data_path, file_name)
   
   headers['Content-Type'] = cont_type(file_path)
   load_file(file_path)
@@ -34,17 +39,17 @@ end
 # Retrieve the form page for editing a file
 get '/:file_name/edit' do
   @file_name = params[:file_name]
-  file_path = "#{@root}/data/#{@file_name}"
+  file_path = File.join(data_path, file_name)
   
   @file = load_file(file_path, format: false)
-
+  # Escape HTML?
   erb :edit_file
 end
 
 # Edit the contents of a file
 post '/:file_name' do
   file_name = params[:file_name]
-  file_path = "#{@root}/data/#{file_name}"
+  file_path = File.join(data_path, file_name)
 
   File.open(file_path, 'w') do |file|
     file.write(params[:content])
@@ -57,6 +62,14 @@ end
 # # # # # # 
 # Helpers #
 # # # # # #
+def data_path
+  if ENV['RACK_ENV'] == 'test'
+    File.expand_path("../tests/data", __FILE__)
+  else
+    File.expand_path("../data", __FILE__)
+  end
+end
+
 def load_file(path, format: true)
   if File.exist?(path)
     format ? format_file(path) : File.read(path)
