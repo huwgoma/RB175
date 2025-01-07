@@ -132,6 +132,16 @@ class CMSTest < Minitest::Test
     assert_includes(last_response.body, 'That file already exists.')
   end
 
+  def test_file_deletion
+    create_document('disposable.txt')
+    post '/disposable.txt/delete'
+
+    assert_equal(302, last_response.status)
+    get last_response['Location']
+    assert_includes(last_response.body, 'disposable.txt has been deleted.')
+    refute_includes(last_response.body, '<a href="/disposable.txt">')
+  end
+
   # # # # # # 
   # Helpers #
   # # # # # #

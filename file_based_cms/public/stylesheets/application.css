@@ -21,3 +21,7 @@ ul {
   background-color: yellow;
   padding: 10px;
 }
+
+form.inline { 
+  display: inline;
+}

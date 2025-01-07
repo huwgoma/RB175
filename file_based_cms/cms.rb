@@ -89,10 +89,6 @@ post '/:file_name/delete' do
   session[:message] = "#{file_name} has been deleted."
   redirect '/'
 end
-# 1) When the user views the home page, they should see a 'delete' button next to each
-#   file.
-# 2) When the user clicks on the delete button, the application should delete the
-# corresponding document and display a message (FILE has been deleted.)
 
 # # # # # # 
 # Helpers #
