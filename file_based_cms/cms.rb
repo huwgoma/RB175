@@ -44,14 +44,14 @@ end
 
 # Form to create new files 
 get '/new' do
-  prevent_access unless logged_in?
+  verify_login_status
 
   erb :new_file
 end
 
 # Create a new file
 post '/new' do
-  prevent_access unless logged_in?
+  verify_login_status
 
   file_name = params[:file_name].strip
   error = file_creation_error(file_name)
@@ -77,7 +77,7 @@ end
 
 # Retrieve the form page for editing a file
 get '/:file_name/edit' do
-  prevent_access unless logged_in?
+  verify_login_status
 
   @file_name = params[:file_name]
   file_path = File.join(data_path, @file_name)
@@ -89,7 +89,7 @@ end
 
 # Edit the contents of a file
 post '/:file_name' do
-  prevent_access unless logged_in?
+  verify_login_status
 
   file_name = params[:file_name]
   file_path = File.join(data_path, file_name)
@@ -104,8 +104,8 @@ end
 
 # Delete a document
 post '/:file_name/delete' do
-  prevent_access unless logged_in?
-
+  verify_login_status
+  
   file_name = params[:file_name]
   file_path = File.join(data_path, file_name)
   
@@ -207,6 +207,10 @@ end
 
 def valid_login?(username, password)
   username == 'admin' && password == 'secret'
+end
+
+def verify_login_status
+  prevent_access unless logged_in?
 end
 
 def prevent_access
