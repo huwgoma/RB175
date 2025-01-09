@@ -14,7 +14,7 @@ require 'pry'
 class CMSTest < Minitest::Test
   include Rack::Test::Methods
 
-  CONTENTS = YAML.load_file(File.expand_path("../contents.yml", data_path))
+  CONTENTS = YAML.load_file(File.join(root_path, 'tests', 'contents.yml'))
   
   def app
     Sinatra::Application

@@ -149,6 +149,10 @@ end
 # # # # # # 
 # Helpers #
 # # # # # #
+def root_path
+  File.expand_path("..", __FILE__)  
+end
+
 def data_path
   if ENV['RACK_ENV'] == 'test'
     File.expand_path("../tests/data", __FILE__)
