@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'redcarpet'
 require 'yaml'
+require 'bcrypt'
 
 require 'sinatra/reloader' if development?
 require 'pry' if development?
@@ -195,7 +196,11 @@ def markdown_to_html(string)
 end
 
 def valid_login?(username, password)
-  load_user_credentials[username] == password
+  credentials = load_user_credentials
+  return false unless credentials.has_key?(username)
+
+  bcrypt_password = BCrypt::Password.new(credentials[username])
+  bcrypt_password == password
 end
 
 def load_user_credentials

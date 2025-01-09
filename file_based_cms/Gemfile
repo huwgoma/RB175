@@ -7,6 +7,7 @@ gem 'sinatra-contrib'
 gem 'puma'
 gem "rackup", "~> 2.2"
 gem "redcarpet"
+gem 'bcrypt'
 
 gem "rack-test"
 gem "minitest"
