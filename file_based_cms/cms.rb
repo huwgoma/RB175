@@ -24,34 +24,6 @@ end
 # # # # # # 
 # Routes  #
 # # # # # # 
-
-# User login form
-get '/users/login' do
-  redirect '/' if logged_in?
-  erb :login  
-end
-
-# User login
-post '/users/login' do
-  if valid_login?(params[:username], params[:password])
-    session[:message] = 'Welcome!'
-    session[:username] = params[:username]
-    session[:logged_in] = true
-    redirect '/'
-  else
-    session[:message] = 'Invalid login credentials.'
-    erb :login
-  end
-end
-
-post '/users/logout' do
-  session.delete(:username)
-  session[:logged_in] = false
-  session[:message] = 'You have been logged out.'
-  
-  redirect '/'
-end
-
 # Home Page - Display all files
 get '/' do
   @file_names = Dir.glob("#{data_path}/*").map { |path| File.basename(path) }
@@ -120,6 +92,37 @@ post '/:file_name/delete' do
   File.delete(file_path)
 
   session[:message] = "#{file_name} has been deleted."
+  redirect '/'
+end
+
+# # # # # # # # 
+# User Logins # 
+# # # # # # # #
+# User login form
+get '/users/login' do
+  redirect '/' if logged_in?
+  erb :login  
+end
+
+# User login
+post '/users/login' do
+  if valid_login?(params[:username], params[:password])
+    session[:message] = 'Welcome!'
+    session[:username] = params[:username]
+    session[:logged_in] = true
+    redirect '/'
+  else
+    session[:message] = 'Invalid login credentials.'
+    erb :login
+  end
+end
+
+# Log out
+post '/users/logout' do
+  session.delete(:username)
+  session[:logged_in] = false
+  session[:message] = 'You have been logged out.'
+  
   redirect '/'
 end
 
