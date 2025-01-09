@@ -21,27 +21,41 @@ helpers do
   end
 end
 
+# Restricting actions
+# When a signed-out user attempts to perform the following actions:
+# - Visit the file edit page (GET /filename/edit)
+# - Submit changes to a file (POST /filename)
+# - Visit the new document page (GET /new) - DONE
+# - Submit the new document form (POST /new)
+# - Delete a document (POST /filename/delete)
+# They should be redirected back to index (/), with the message
+#   "YOu must be signed in to do that!"
+
 # # # # # # 
 # Routes  #
 # # # # # # 
 # Home Page - Display all files
 get '/' do
   @file_names = Dir.glob("#{data_path}/*").map { |path| File.basename(path) }
-  @username = session[:username]
+  @username = session[:username] if logged_in?
 
   erb :index
 end
 
 # Form to create new files 
 get '/new' do
+  prevent_access unless logged_in?
+
   erb :new_file
 end
 
 # Create a new file
 post '/new' do
-  file_name = params[:file_name].strip
+  prevent_access unless logged_in?
 
+  file_name = params[:file_name].strip
   error = file_creation_error(file_name)
+
   if error
     session[:message] = error
     erb :new_file
@@ -63,6 +77,8 @@ end
 
 # Retrieve the form page for editing a file
 get '/:file_name/edit' do
+  prevent_access unless logged_in?
+
   @file_name = params[:file_name]
   file_path = File.join(data_path, @file_name)
   
@@ -73,6 +89,8 @@ end
 
 # Edit the contents of a file
 post '/:file_name' do
+  prevent_access unless logged_in?
+
   file_name = params[:file_name]
   file_path = File.join(data_path, file_name)
 
@@ -86,6 +104,8 @@ end
 
 # Delete a document
 post '/:file_name/delete' do
+  prevent_access unless logged_in?
+
   file_name = params[:file_name]
   file_path = File.join(data_path, file_name)
   
@@ -188,3 +208,9 @@ end
 def valid_login?(username, password)
   username == 'admin' && password == 'secret'
 end
+
+def prevent_access
+  session[:message] = "You must be logged in to do that."
+  redirect '/'
+end
+

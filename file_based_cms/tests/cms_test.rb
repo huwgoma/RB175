@@ -11,8 +11,6 @@ require_relative('../cms')
 
 require 'pry'
 
-
-
 class CMSTest < Minitest::Test
   include Rack::Test::Methods
 
@@ -75,7 +73,7 @@ class CMSTest < Minitest::Test
   def test_file_edit_form
     create_document('changes.txt', CONTENTS['changes'])
 
-    get '/changes.txt/edit'
+    get '/changes.txt/edit', {}, login_session
 
     assert_equal(200, last_response.status)
     assert_includes(last_response.body, "<textarea")
@@ -85,7 +83,7 @@ class CMSTest < Minitest::Test
   def test_file_editing
     create_document('changes.txt', CONTENTS['changes'])
 
-    post '/changes.txt', content: "Edited Contents!"
+    post '/changes.txt', { content: "Edited Contents!" }, login_session
 
     # Sets message and redirects 
     assert_equal(302, last_response.status)
@@ -100,14 +98,15 @@ class CMSTest < Minitest::Test
   end
 
   def test_new_file_form
-    get '/new'
+    get '/new', {}, login_session
 
     assert_equal(200, last_response.status)
     assert_includes(last_response.body, '<form action="/new" method="post">')
   end
 
   def test_successful_file_creation
-    post '/new', file_name: "new_file.txt"
+    post '/new', { file_name: "new_file.txt" }, login_session
+
     assert_equal(302, last_response.status)
     assert_equal("new_file.txt was created.", session[:message])
     # Follow redirect to home
@@ -116,7 +115,7 @@ class CMSTest < Minitest::Test
   end
 
   def test_bad_file_creation
-    post '/new', file_name: ''
+    post '/new', { file_name: '' }, login_session
     assert_includes(last_response.body, 'File name cannot be blank.')
     
     post '/new', file_name: "no_ext"
@@ -129,7 +128,7 @@ class CMSTest < Minitest::Test
 
   def test_file_deletion
     create_document('disposable.txt')
-    post '/disposable.txt/delete'
+    post '/disposable.txt/delete', {}, login_session
 
     assert_equal(302, last_response.status)
     assert_equal('disposable.txt has been deleted.', session[:message])
@@ -138,9 +137,12 @@ class CMSTest < Minitest::Test
     refute_includes(last_response.body, '<a href="/disposable.txt">')
   end
 
+  # # # # #
+  # Login #
+  # # # # #
   def test_login_form
     # Redirects users if logged in
-    get '/users/login', {}, { 'rack.session' => { logged_in: true } }
+    get '/users/login', {}, login_session
     assert_equal(302, last_response.status)
     
     # Displays form if not logged in
@@ -176,13 +178,50 @@ class CMSTest < Minitest::Test
 
   def test_logout
     # Log in
-    post '/users/login', username: 'admin', password: 'secret'
+    post '/users/login', {}, login_session
 
     post '/users/logout'
     assert_equal(302, last_response.status)
     assert_equal(false, session[:logged_in])
     assert_nil(session[:username])
     assert_equal('You have been logged out.', session[:message])
+  end
+
+  # Login Restrictions
+  def test_restrict_create_view_access
+    get '/new'
+    assert_equal('You must be logged in to do that.', session[:message])
+    assert_equal(302, last_response.status)
+  end
+
+  def test_restrict_create_submit_access
+    post '/new'
+    assert_equal('You must be logged in to do that.', session[:message])
+    assert_equal(302, last_response.status)
+  end
+
+  def test_restrict_edit_view_access
+    create_document('file.txt')
+    
+    get '/file.txt/edit'
+    assert_equal('You must be logged in to do that.', session[:message])
+    assert_equal(302, last_response.status)
+  end
+
+  def test_restrict_edit_submit_access
+    create_document('file.txt')
+    
+    post '/file.txt'
+    assert_equal('You must be logged in to do that.', session[:message])
+    assert_equal(302, last_response.status)
+  end
+
+  def test_restrict_delete_access
+    create_document('file.txt')
+    
+    post '/file.txt/delete'
+    assert_equal('You must be logged in to do that.', session[:message])
+    assert_equal(302, last_response.status)
   end
 
   # # # # # # 
@@ -196,6 +235,10 @@ class CMSTest < Minitest::Test
     File.open(File.join(data_path, name), 'w') do |file|
       file.write(content)
     end
+  end
+
+  def login_session
+    { 'rack.session' => { username: 'admin', logged_in: true }}
   end
 end
 
