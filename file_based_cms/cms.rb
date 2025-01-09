@@ -10,20 +10,10 @@ configure do
   set :session_secret, SecureRandom.hex(32)  
 end
 
-def root_path
-  File.expand_path("..", __FILE__)  
-end
-
-CONFIG = YAML.load_file(File.join(root_path, 'config.yml'))
-
 helpers do
   def logged_in?
     session[:logged_in]
   end
-end
-
-def valid_login?(username, password)
-  CONFIG['accounts'][username] == password
 end
 
 # # # # # # 
@@ -144,6 +134,10 @@ end
 # # # # # # 
 # Helpers #
 # # # # # #
+def root_path
+  File.expand_path("..", __FILE__)  
+end
+
 def data_path
   if ENV['RACK_ENV'] == 'test'
     File.expand_path("../tests/data", __FILE__)
@@ -200,9 +194,19 @@ def markdown_to_html(string)
   markdown.render(string)
 end
 
-# def valid_login?(username, password)
-#   username == 'admin' && password == 'secret'
-# end
+def valid_login?(username, password)
+  load_user_credentials[username] == password
+end
+
+def load_user_credentials
+  users_path = if ENV['RACK_ENV'] == 'test'
+    File.join(root_path, 'tests', 'users.yml')
+  else
+    File.join(root_path, 'users.yml')
+  end
+
+  YAML.load_file(users_path)
+end
 
 def verify_login_status
   prevent_access unless logged_in?
