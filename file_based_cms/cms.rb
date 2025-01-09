@@ -1,19 +1,20 @@
 require 'sinatra'
 require 'redcarpet'
+require 'yaml'
 
-if development?
-  require 'sinatra/reloader'
-  require 'pry'
-end
+require 'sinatra/reloader' if development?
+require 'pry' if development?
 
 configure do
   enable :sessions
   set :session_secret, SecureRandom.hex(32)  
 end
 
-before do
-
+def root_path
+  File.expand_path("..", __FILE__)  
 end
+
+CONFIG = YAML.load_file(File.join(root_path, 'config.yml'))
 
 helpers do
   def logged_in?
@@ -21,15 +22,9 @@ helpers do
   end
 end
 
-# Restricting actions
-# When a signed-out user attempts to perform the following actions:
-# - Visit the file edit page (GET /filename/edit)
-# - Submit changes to a file (POST /filename)
-# - Visit the new document page (GET /new) - DONE
-# - Submit the new document form (POST /new)
-# - Delete a document (POST /filename/delete)
-# They should be redirected back to index (/), with the message
-#   "YOu must be signed in to do that!"
+def valid_login?(username, password)
+  CONFIG['accounts'][username] == password
+end
 
 # # # # # # 
 # Routes  #
@@ -149,10 +144,6 @@ end
 # # # # # # 
 # Helpers #
 # # # # # #
-def root_path
-  File.expand_path("..", __FILE__)  
-end
-
 def data_path
   if ENV['RACK_ENV'] == 'test'
     File.expand_path("../tests/data", __FILE__)
@@ -209,9 +200,9 @@ def markdown_to_html(string)
   markdown.render(string)
 end
 
-def valid_login?(username, password)
-  username == 'admin' && password == 'secret'
-end
+# def valid_login?(username, password)
+#   username == 'admin' && password == 'secret'
+# end
 
 def verify_login_status
   prevent_access unless logged_in?
