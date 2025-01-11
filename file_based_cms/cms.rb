@@ -17,6 +17,17 @@ helpers do
   end
 end
 
+# Additional Features:
+# 1) Validate Extension Names - Must be a supported ext (.txt or .md)
+#   - POST /new -> file_creation_error
+#    - If extname is not .txt or .md, invalid.
+#    
+#
+# 2) Duplicate File - Create a new document with the same contents as an existing one 
+# 3) User Signup Form - Allow users to create new accounts
+# 4) Allow images to be added to the CMS (wrapped within .md files; ![text][path/to/img])
+# 5) Preserve each document version as changes are made.
+
 # # # # # # 
 # Routes  #
 # # # # # # 
@@ -181,8 +192,23 @@ def file_creation_error(name)
     'File name cannot be blank.'
   elsif File.extname(name).empty?
     'File extension cannot be blank.'
+  elsif !supported_extnames.include?(File.extname(name))
+    "Only #{joinor(supported_extnames, ' or ')} files are supported."
   elsif File.exist?(File.join(data_path, name))
     'That file already exists.'
+  end
+end
+
+def supported_extnames
+  ['.txt', '.md']
+end
+
+def joinor(array, separator=" ")
+  case 
+  when array.size <= 2
+    array.join(separator)
+  when array.size >= 3
+    "#{array[0..-2].join(', ')}, #{separator.strip} #{array[-1]}"
   end
 end
 

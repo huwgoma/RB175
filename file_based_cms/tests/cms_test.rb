@@ -121,6 +121,9 @@ class CMSTest < Minitest::Test
     post '/new', file_name: "no_ext"
     assert_includes(last_response.body, 'File extension cannot be blank.')
 
+    post '/new', file_name: "bad_ext.ext"
+    assert_includes(last_response.body, 'Only .txt or .md files are supported.')
+
     create_document('changes.txt')
     post '/new', file_name: 'changes.txt'
     assert_includes(last_response.body, 'That file already exists.')
