@@ -163,7 +163,7 @@ class CMSTest < Minitest::Test
   end
 
   # # # # #
-  # Login #
+  # Users #
   # # # # #
   def test_login_form
     # Redirects users if logged in

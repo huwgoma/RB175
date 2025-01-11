@@ -19,24 +19,32 @@ end
 
 # Additional Features:
 
-# 2) Duplicate File - Create a new document with the same contents as an 
-#    existing one 
-#   - On the new document view?
-#   Create a new document: [      ]
-#   Or, duplicate an existing one:
-#   > about.md
-#   > changes.txt
-#   -> When clicked:
-#   - Create a new file with the name copy_of_filename, and the
-#     contents of filename
-#   - Redirect to homepage
-#   
-#   - Most of this ^ functionality is identical to POST /new
-#     - The only real difference is that we are attaching 
-#       copy_of_ to the file name, and copying the contents over
-#
 #
 # 3) User Signup Form - Allow users to create new accounts
+#   - Index, logged out: 
+#   [Log In]
+
+#   [Username]
+#   [Password]
+#   
+#   Don't have an account? [Register!] => Routes to GET 'users/new'
+#     new_user.erb
+#     [Username]
+#     [Password] [Register] => Routes to POST /users 
+
+#   
+# POST /users (create a new user)
+#  - Username must be unique (cannot be in users.yml)
+#  - Username and password cannot be empty.
+#  If everything is valid, create a new user:
+#  - Hash the password
+#  - Store the username/hashed password as a key-value pair in users.yml
+#
+#
+#
+#
+#
+#
 # 4) Allow images to be added to the CMS (wrapped within .md files; ![text][path/to/img])
 # 5) Preserve each document version as changes are made.
 
