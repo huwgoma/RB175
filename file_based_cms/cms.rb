@@ -20,25 +20,7 @@ end
 # Additional Features:
 
 #
-# 3) User Signup Form - Allow users to create new accounts
-#   - Index, logged out: 
-#   [Log In]
 
-#   [Username]
-#   [Password]
-#   
-#   Don't have an account? [Register!] => Routes to GET 'users/new'
-#     new_user.erb
-#     [Username]
-#     [Password] [Register] => Routes to POST /users 
-
-#   
-# POST /users (create a new user)
-#  - Username must be unique (cannot be in users.yml)
-#  - Username and password cannot be empty.
-#  If everything is valid, create a new user:
-#  - Hash the password
-#  - Store the username/hashed password as a key-value pair in users.yml
 #
 #
 #
@@ -149,6 +131,53 @@ end
 # # # # # # # # 
 # User Logins # 
 # # # # # # # #
+# 3) User Signup Form - Allow users to create new accounts
+#   - Index, logged out: 
+#   [Log In]
+
+#   [Username]
+#   [Password]
+#   
+#   Don't have an account? [Register!] => Routes to GET 'users/new'
+#     new_user.erb
+#     [Username]
+#     [Password] [Register] => Routes to POST /users 
+
+#   
+# POST /users (create a new user)
+#  - Username must be unique (cannot be in users.yml)
+#  - Username and password cannot be empty.
+#  If everything is valid, create a new user:
+#  - Hash the password
+#  - Store the username/hashed password as a key-value pair in users.yml
+#  
+# Redirect to login (?)
+
+get '/users/new' do
+  erb :new_user
+end
+
+post '/users/new' do
+  username, password = params[:username], params[:password]
+  error = user_creation_error(username, password)
+
+  if error
+    
+  else
+    credentials = load_user_credentials
+    bcrypt_password = BCrypt::Password.create(password).to_s
+    credentials[username] = bcrypt_password
+    
+    File.open(File.join(root_path, 'users.yml'), 'w') do |file|
+      file.write(credentials.to_yaml)
+    end
+  end
+end
+
+def user_creation_error(username, password)
+  
+end
+
 # User login form
 get '/users/login' do
   redirect '/' if logged_in?
