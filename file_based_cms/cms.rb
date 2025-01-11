@@ -162,8 +162,10 @@ post '/users/new' do
   error = user_creation_error(username, password)
 
   if error
-    
+    session[:message] = error
+    erb :new_user
   else
+    # extract
     credentials = load_user_credentials
     bcrypt_password = BCrypt::Password.create(password).to_s
     credentials[username] = bcrypt_password
@@ -178,7 +180,13 @@ post '/users/new' do
 end
 
 def user_creation_error(username, password)
-  
+  if [username, password].map(&:strip).any?(&:empty?) 
+    'Username and password cannot be blank.'
+  elsif load_user_credentials.has_key?(username)
+    'Sorry, that username is already taken.'
+  end
+  # Cannot be empty
+  # Username cannot already be in users.yml
 end
 
 # User login form
@@ -223,6 +231,8 @@ def data_path
     File.expand_path("../data", __FILE__)
   end
 end
+
+# users_path
 
 def load_file_names
   Dir.glob("#{data_path}/*").map { |path| File.basename(path) }
