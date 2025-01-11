@@ -10,8 +10,13 @@
 
 <p>Or, duplicate an existing file:</p>
 
-<% @file_names.each do |file_name| %>
-  <form action="/<%= file_name %>/duplicate" method="post">
-    <input class="submit-link" type="submit" value="<%= file_name %>">
-  </form>
-<% end %>
+<ul>
+  <% @file_names.each do |file_name| %>
+    <li>
+      <form action="/<%= file_name %>/duplicate" method="post">
+        <input class="submit-link" type="submit" value="<%= file_name %>">
+      </form>
+    </li>
+
+  <% end %>
+</ul>
