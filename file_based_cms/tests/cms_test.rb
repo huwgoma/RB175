@@ -22,10 +22,12 @@ class CMSTest < Minitest::Test
 
   def setup
     FileUtils::mkdir_p(data_path)
+    # Create users.yml and populate it with admin: secret (h)
   end
 
   def teardown
     FileUtils::rm_rf(data_path)
+    # FileUtils::rm_rf(users_path)
   end
 
   def test_index
@@ -165,7 +167,25 @@ class CMSTest < Minitest::Test
   # # # # #
   # Users #
   # # # # #
-  
+  def test_good_user_registration
+    post '/users/new', username: 'user', password: 'good_password'
+
+    assert_includes(session[:message], 'Welcome!')
+    assert_equal(302, last_response.status)
+
+    post '/users/login', username: 'user', password: 'good_password'
+    
+    assert_equal(true, session[:logged_in])
+     
+    #
+    # User is signed out.
+    # User submits a good user/password combo
+    # message is set
+    # follow redirect to login page
+    # login with user/password combo
+    # session[Logged in] should be true
+  end
+
   def test_login_form
     # Redirects users if logged in
     get '/users/login', {}, login_session
