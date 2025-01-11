@@ -154,6 +154,8 @@ end
 # Redirect to login (?)
 
 get '/users/new' do
+  redirect '/' if logged_in?
+  
   erb :new_user
 end
 
