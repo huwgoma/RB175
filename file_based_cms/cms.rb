@@ -172,7 +172,7 @@ post '/users/new' do
     bcrypt_password = BCrypt::Password.create(password).to_s
     credentials[username] = bcrypt_password
     
-    File.open(File.join(root_path, 'users.yml'), 'w') do |file|
+    File.open(users_path, 'w') do |file|
       file.write(credentials.to_yaml)
     end
 
@@ -187,8 +187,6 @@ def user_creation_error(username, password)
   elsif load_user_credentials.has_key?(username)
     'Sorry, that username is already taken.'
   end
-  # Cannot be empty
-  # Username cannot already be in users.yml
 end
 
 # User login form
@@ -242,7 +240,6 @@ def users_path
   end
 end
 
-# users_path
 def load_user_credentials
   YAML.load_file(users_path)
 end
@@ -319,7 +316,7 @@ end
 def valid_login?(username, password)
   credentials = load_user_credentials
   return false unless credentials.has_key?(username)
-
+# refactor
   bcrypt_password = BCrypt::Password.new(credentials[username])
   bcrypt_password == password
 end
