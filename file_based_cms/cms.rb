@@ -155,7 +155,7 @@ end
 
 get '/users/new' do
   redirect '/' if logged_in?
-  
+
   erb :new_user
 end
 
@@ -228,13 +228,24 @@ end
 
 def data_path
   if ENV['RACK_ENV'] == 'test'
-    File.expand_path("../tests/data", __FILE__)
+    File.join(root_path, 'tests', 'data')
   else
-    File.expand_path("../data", __FILE__)
+    File.join(root_path, 'data')
+  end
+end
+
+def users_path
+  if ENV['RACK_ENV'] == 'test'
+    File.join(root_path, 'tests', 'users.yml')
+  else
+    File.join(root_path, 'users.yml')
   end
 end
 
 # users_path
+def load_user_credentials
+  YAML.load_file(users_path)
+end
 
 def load_file_names
   Dir.glob("#{data_path}/*").map { |path| File.basename(path) }
@@ -313,15 +324,7 @@ def valid_login?(username, password)
   bcrypt_password == password
 end
 
-def load_user_credentials
-  users_path = if ENV['RACK_ENV'] == 'test'
-    File.join(root_path, 'tests', 'users.yml')
-  else
-    File.join(root_path, 'users.yml')
-  end
 
-  YAML.load_file(users_path)
-end
 
 def verify_login_status
   prevent_access unless logged_in?
