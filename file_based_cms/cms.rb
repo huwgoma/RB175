@@ -171,6 +171,9 @@ post '/users/new' do
     File.open(File.join(root_path, 'users.yml'), 'w') do |file|
       file.write(credentials.to_yaml)
     end
+
+    session[:message] = 'Welcome! Please enter your username and password.'
+    redirect '/users/login'
   end
 end
 

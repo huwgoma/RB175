@@ -165,6 +165,7 @@ class CMSTest < Minitest::Test
   # # # # #
   # Users #
   # # # # #
+  
   def test_login_form
     # Redirects users if logged in
     get '/users/login', {}, login_session
