@@ -81,7 +81,7 @@ end
 post '/:file_name/duplicate' do
   verify_login_status
 
-  original_contents = load_file(File.join(data_path, params[:file_name]))
+  original_contents = load_file(File.join(data_path, params[:file_name]), format: false)
   copy_file_name = "copy_of_#{params[:file_name]}"
   create_file(copy_file_name, original_contents)
   

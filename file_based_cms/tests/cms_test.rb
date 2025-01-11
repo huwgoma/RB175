@@ -138,6 +138,19 @@ class CMSTest < Minitest::Test
     assert_includes(last_response.body, 'copy_of_test.txt')
   end
 
+  def test_md_file_duplication
+    create_document('test.md', '# Heading 1')
+    post '/test.md/duplicate', {}, login_session
+
+    assert_equal('copy_of_test.md was created.', session[:message])
+
+    get last_response['Location']
+    assert_includes(last_response.body, 'copy_of_test.md')
+
+    get '/copy_of_test.md/edit'
+    assert_includes(last_response.body, '# Heading 1')
+  end
+
   def test_file_deletion
     create_document('disposable.txt')
     post '/disposable.txt/delete', {}, login_session
