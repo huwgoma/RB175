@@ -129,6 +129,15 @@ class CMSTest < Minitest::Test
     assert_includes(last_response.body, 'That file already exists.')
   end
 
+  def test_file_duplication
+    create_document('test.txt', 'Hello World!')
+    post '/test.txt/duplicate', {}, login_session
+    assert_equal('copy_of_test.txt was created.', session[:message])
+
+    get last_response['Location']
+    assert_includes(last_response.body, 'copy_of_test.txt')
+  end
+
   def test_file_deletion
     create_document('disposable.txt')
     post '/disposable.txt/delete', {}, login_session

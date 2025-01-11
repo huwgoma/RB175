@@ -18,12 +18,24 @@ helpers do
 end
 
 # Additional Features:
-# 1) Validate Extension Names - Must be a supported ext (.txt or .md)
-#   - POST /new -> file_creation_error
-#    - If extname is not .txt or .md, invalid.
-#    
+
+# 2) Duplicate File - Create a new document with the same contents as an 
+#    existing one 
+#   - On the new document view?
+#   Create a new document: [      ]
+#   Or, duplicate an existing one:
+#   > about.md
+#   > changes.txt
+#   -> When clicked:
+#   - Create a new file with the name copy_of_filename, and the
+#     contents of filename
+#   - Redirect to homepage
+#   
+#   - Most of this ^ functionality is identical to POST /new
+#     - The only real difference is that we are attaching 
+#       copy_of_ to the file name, and copying the contents over
 #
-# 2) Duplicate File - Create a new document with the same contents as an existing one 
+#
 # 3) User Signup Form - Allow users to create new accounts
 # 4) Allow images to be added to the CMS (wrapped within .md files; ![text][path/to/img])
 # 5) Preserve each document version as changes are made.
@@ -33,7 +45,7 @@ end
 # # # # # # 
 # Home Page - Display all files
 get '/' do
-  @file_names = Dir.glob("#{data_path}/*").map { |path| File.basename(path) }
+  @file_names = load_file_names
   @username = session[:username] if logged_in?
 
   erb :index
@@ -43,6 +55,7 @@ end
 get '/new' do
   verify_login_status
 
+  @file_names = load_file_names
   erb :new_file
 end
 
@@ -55,12 +68,25 @@ post '/new' do
 
   if error
     session[:message] = error
+    @file_names = load_file_names
     erb :new_file
   else
     create_file(file_name)
     session[:message] = "#{file_name} was created."
     redirect '/'
   end
+end
+
+# Duplicate a file
+post '/:file_name/duplicate' do
+  verify_login_status
+
+  original_contents = load_file(File.join(data_path, params[:file_name]))
+  copy_file_name = "copy_of_#{params[:file_name]}"
+  create_file(copy_file_name, original_contents)
+  
+  session[:message] = "#{copy_file_name} was created."
+  redirect '/'
 end
 
 # Retrieve and display a specific file
@@ -158,6 +184,10 @@ def data_path
   end
 end
 
+def load_file_names
+  Dir.glob("#{data_path}/*").map { |path| File.basename(path) }
+end
+
 def load_file(path, format: true)
   if File.exist?(path)
     format ? format_file(path) : File.read(path)
@@ -212,8 +242,10 @@ def joinor(array, separator=" ")
   end
 end
 
-def create_file(name)
-  File.new(File.join(data_path, name), 'w')
+def create_file(name, contents="")
+  File.open(File.join(data_path, name), 'w') do |file|
+    file.write(contents)
+  end
 end
 
 def markdown_to_html(string)
