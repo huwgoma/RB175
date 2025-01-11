@@ -11,16 +11,18 @@ $(function(){
       // $(this).submit();
 
       var form = $(this);
-      var request = $.ajax( {
+      var request = jQuery.ajax( {
         url: form.attr("action"),
         method: form.attr("method")
       });
 
-      request.done(function(data, textStatus, jqXHR) {
+      // callback - execute when the request is successful
+      request.done(function(body, textStatus, jqXHR) {
+
         if (jqXHR.status == 204 ){ 
           form.parent("li").remove(); // delete todo
         } else if (jqXHR.status == 200){
-          document.location = data;
+          document.location = body;
         }
       });
 
