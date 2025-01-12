@@ -182,20 +182,27 @@ end
 # User login form
 get '/users/login' do
   redirect '/' if logged_in?
+
   erb :login  
 end
 
 # User login
 post '/users/login' do
-  if valid_login?(params[:username], params[:password])
-    session[:message] = 'Welcome!'
-    session[:username] = params[:username]
-    session[:logged_in] = true
+  username, password = params[:username], params[:password]
+
+  if valid_login?(username, password)
+    set_login_session(username)
     redirect '/'
   else
     session[:message] = 'Invalid login credentials.'
     erb :login
   end
+end
+
+def set_login_session(username)
+  session[:message] = 'Welcome!'
+  session[:username] = username
+  session[:logged_in] = true
 end
 
 def valid_login?(username, password)
