@@ -18,7 +18,8 @@ helpers do
 end
 
 # Additional Features:
-
+# 4) Allow images in the CMS
+# - 
 #
 
 #
@@ -154,31 +155,6 @@ post '/users/new' do
   end
 end
 
-def add_user_credentials(username, password)
-  credentials = load_user_credentials
-  hashed_password = bcrypt_hash(password)
-
-  credentials[username] = hashed_password
-
-  write_to_file(users_path, credentials.to_yaml)
-end
-
-def bcrypt_hash(password)
-  BCrypt::Password.create(password).to_s
-end
-
-def write_to_file(path, contents='')
-  File.open(path, 'w') { |file| file.write(contents) }
-end
-
-def user_creation_error(username, password)
-  if [username, password].map(&:strip).any?(&:empty?) 
-    'Username and password cannot be blank.'
-  elsif load_user_credentials.has_key?(username)
-    'Sorry, that username is already taken.'
-  end
-end
-
 # User login form
 get '/users/login' do
   redirect '/' if logged_in?
@@ -199,18 +175,6 @@ post '/users/login' do
   end
 end
 
-def set_login_session(username)
-  session[:message] = 'Welcome!'
-  session[:username] = username
-  session[:logged_in] = true
-end
-
-def valid_login?(username, password)
-  credentials = load_user_credentials
-  
-  BCrypt::Password.new(credentials[username]) == password
-end
-
 # Log out
 post '/users/logout' do
   session.delete(:username)
@@ -220,9 +184,14 @@ post '/users/logout' do
   redirect '/'
 end
 
-# # # # # # 
-# Helpers #
-# # # # # #
+#########################################  
+#               Helpers                 #
+#########################################
+
+# # # # # 
+# Files #
+# # # # # 
+# Pathfinding
 def root_path
   File.expand_path("..", __FILE__)  
 end
@@ -243,14 +212,7 @@ def users_path
   end
 end
 
-def load_user_credentials
-  YAML.load_file(users_path)
-end
-
-def load_file_names
-  Dir.glob("#{data_path}/*").map { |path| File.basename(path) }
-end
-
+# Loading
 def load_file(path, format: true)
   if File.exist?(path)
     format ? format_file(path) : File.read(path)
@@ -271,6 +233,14 @@ def format_file(path)
   end
 end
 
+def load_user_credentials
+  YAML.load_file(users_path)
+end
+
+def load_file_names
+  Dir.glob("#{data_path}/*").map { |path| File.basename(path) }
+end
+
 def cont_type(path)
   case File.extname(path)
   when '.txt'
@@ -280,6 +250,25 @@ def cont_type(path)
   end
 end
 
+# Writing
+def write_to_file(path, contents='')
+  File.open(path, 'w') { |file| file.write(contents) }
+end
+
+def create_file(name, contents="")
+  write_to_file(File.join(data_path, name), contents)
+end
+
+def add_user_credentials(username, password)
+  credentials = load_user_credentials
+  hashed_password = bcrypt_hash(password)
+
+  credentials[username] = hashed_password
+
+  write_to_file(users_path, credentials.to_yaml)
+end
+
+# Validation
 def file_creation_error(name)
   if name.empty?
     'File name cannot be blank.'
@@ -296,27 +285,16 @@ def supported_extnames
   ['.txt', '.md']
 end
 
-def joinor(array, separator=" ")
-  case 
-  when array.size <= 2
-    array.join(separator)
-  when array.size >= 3
-    "#{array[0..-2].join(', ')}, #{separator.strip} #{array[-1]}"
+# # # # # # # # # # 
+# User & Sessions # 
+# # # # # # # # # #
+def user_creation_error(username, password)
+  if [username, password].map(&:strip).any?(&:empty?) 
+    'Username and password cannot be blank.'
+  elsif load_user_credentials.has_key?(username)
+    'Sorry, that username is already taken.'
   end
 end
-
-def create_file(name, contents="")
-  write_to_file(File.join(data_path, name), contents)
-end
-
-def markdown_to_html(string)
-  markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
-  markdown.render(string)
-end
-
-
-
-
 
 def verify_login_status
   prevent_access unless logged_in?
@@ -327,3 +305,35 @@ def prevent_access
   redirect '/'
 end
 
+def valid_login?(username, password)
+  credentials = load_user_credentials
+  
+  BCrypt::Password.new(credentials[username]) == password
+end
+
+def set_login_session(username)
+  session[:message] = 'Welcome!'
+  session[:username] = username
+  session[:logged_in] = true
+end
+
+def bcrypt_hash(password)
+  BCrypt::Password.create(password).to_s
+end
+
+# # # # # 
+# Misc. # 
+# # # # #
+def markdown_to_html(string)
+  markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
+  markdown.render(string)
+end
+
+def joinor(array, separator=" ")
+  case 
+  when array.size <= 2
+    array.join(separator)
+  when array.size >= 3
+    "#{array[0..-2].join(', ')}, #{separator.strip} #{array[-1]}"
+  end
+end
