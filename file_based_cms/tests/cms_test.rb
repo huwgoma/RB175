@@ -23,12 +23,11 @@ class CMSTest < Minitest::Test
   def setup
     FileUtils::mkdir_p(data_path)
 
-    File.open(users_path, 'w') do |file|
-      file.write(
-        "admin: '$2a$12$E79ZP6S6rO8aZhVqzV3MMu/F262kFUC7RR4PiigtD61LeOYoU8OnS'"
-        # secret
-      )
-    end
+    write_to_file(
+      users_path,
+      # admin: secret 
+      "admin: '$2a$12$E79ZP6S6rO8aZhVqzV3MMu/F262kFUC7RR4PiigtD61LeOYoU8OnS'"
+    )
   end
 
   def teardown
@@ -36,6 +35,9 @@ class CMSTest < Minitest::Test
     FileUtils::rm_rf(users_path)
   end
 
+  # # # # # #  
+  #  Files  #
+  # # # # # #
   def test_index
     files = ['about.md', 'changes.txt']
     files.each { |filename| create_document(filename) }
@@ -170,9 +172,9 @@ class CMSTest < Minitest::Test
     refute_includes(last_response.body, '<a href="/disposable.txt">')
   end
 
-  # # # # #
-  # Users #
-  # # # # #
+  # # # # # #
+  #  Users  #
+  # # # # # #
   def test_good_user_registration
     post '/users/new', username: 'user', password: 'good_password'
 
@@ -182,14 +184,6 @@ class CMSTest < Minitest::Test
     post '/users/login', username: 'user', password: 'good_password'
     
     assert_equal(true, session[:logged_in])
-     
-    #
-    # User is signed out.
-    # User submits a good user/password combo
-    # message is set
-    # follow redirect to login page
-    # login with user/password combo
-    # session[Logged in] should be true
   end
 
   def test_login_form
@@ -239,7 +233,7 @@ class CMSTest < Minitest::Test
     assert_equal('You have been logged out.', session[:message])
   end
 
-  # Login Restrictions
+  # Permissions
   def test_restrict_create_view_access
     get '/new'
     assert_equal('You must be logged in to do that.', session[:message])

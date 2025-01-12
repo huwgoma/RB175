@@ -30,9 +30,12 @@ end
 # 4) Allow images to be added to the CMS (wrapped within .md files; ![text][path/to/img])
 # 5) Preserve each document version as changes are made.
 
-# # # # # # 
-# Routes  #
-# # # # # # 
+#########################################  
+#                Routes                 #
+#########################################
+# # # # # # # 
+#   Files   #
+# # # # # # #
 # Home Page - Display all files
 get '/' do
   @file_names = load_file_names
@@ -41,7 +44,7 @@ get '/' do
   erb :index
 end
 
-# Form to create new files 
+# Form for creating files 
 get '/new' do
   verify_login_status
 
@@ -49,15 +52,14 @@ get '/new' do
   erb :new_file
 end
 
-# Create a new file
+# Create a file
 post '/new' do
   verify_login_status
 
   file_name = params[:file_name].strip
-  error = file_creation_error(file_name)
+  session[:message] = file_creation_error(file_name)
 
-  if error
-    session[:message] = error
+  if session[:message]
     @file_names = load_file_names
     erb :new_file
   else
@@ -79,7 +81,7 @@ post '/:file_name/duplicate' do
   redirect '/'
 end
 
-# Retrieve and display a specific file
+# Read a file
 get '/:file_name' do
   file_name = params[:file_name]
   file_path = File.join(data_path, file_name)
@@ -88,7 +90,7 @@ get '/:file_name' do
   load_file(file_path)
 end
 
-# Retrieve the form page for editing a file
+# Form for editing files 
 get '/:file_name/edit' do
   verify_login_status
 
@@ -100,22 +102,20 @@ get '/:file_name/edit' do
   erb :edit_file
 end
 
-# Edit the contents of a file
+# Edit a file
 post '/:file_name' do
   verify_login_status
 
   file_name = params[:file_name]
   file_path = File.join(data_path, file_name)
 
-  File.open(file_path, 'w') do |file|
-    file.write(params[:content])
-  end
+  write_to_file(file_path, params[:content])
 
   session[:message] = "#{file_name} has been updated."
   redirect '/'
 end
 
-# Delete a document
+# Delete a file
 post '/:file_name/delete' do
   verify_login_status
   
@@ -131,54 +131,44 @@ end
 # # # # # # # # 
 # User Logins # 
 # # # # # # # #
-# 3) User Signup Form - Allow users to create new accounts
-#   - Index, logged out: 
-#   [Log In]
 
-#   [Username]
-#   [Password]
-#   
-#   Don't have an account? [Register!] => Routes to GET 'users/new'
-#     new_user.erb
-#     [Username]
-#     [Password] [Register] => Routes to POST /users 
-
-#   
-# POST /users (create a new user)
-#  - Username must be unique (cannot be in users.yml)
-#  - Username and password cannot be empty.
-#  If everything is valid, create a new user:
-#  - Hash the password
-#  - Store the username/hashed password as a key-value pair in users.yml
-#  
-# Redirect to login (?)
-
+# Form for creating new users
 get '/users/new' do
   redirect '/' if logged_in?
 
   erb :new_user
 end
 
+# Create a new user
 post '/users/new' do
   username, password = params[:username], params[:password]
-  error = user_creation_error(username, password)
+  session[:message] = user_creation_error(username, password)
 
-  if error
-    session[:message] = error
+  if session[:message]
     erb :new_user
   else
-    # extract
-    credentials = load_user_credentials
-    bcrypt_password = BCrypt::Password.create(password).to_s
-    credentials[username] = bcrypt_password
-    
-    File.open(users_path, 'w') do |file|
-      file.write(credentials.to_yaml)
-    end
+    add_user_credentials(username, password)
 
     session[:message] = 'Welcome! Please enter your username and password.'
     redirect '/users/login'
   end
+end
+
+def add_user_credentials(username, password)
+  credentials = load_user_credentials
+  hashed_password = bcrypt_hash(password)
+
+  credentials[username] = hashed_password
+
+  write_to_file(users_path, credentials.to_yaml)
+end
+
+def bcrypt_hash(password)
+  BCrypt::Password.create(password).to_s
+end
+
+def write_to_file(path, contents='')
+  File.open(path, 'w') { |file| file.write(contents) }
 end
 
 def user_creation_error(username, password)
@@ -311,9 +301,7 @@ def joinor(array, separator=" ")
 end
 
 def create_file(name, contents="")
-  File.open(File.join(data_path, name), 'w') do |file|
-    file.write(contents)
-  end
+  write_to_file(File.join(data_path, name), contents)
 end
 
 def markdown_to_html(string)
