@@ -22,12 +22,18 @@ class CMSTest < Minitest::Test
 
   def setup
     FileUtils::mkdir_p(data_path)
-    # Create users.yml and populate it with admin: secret (h)
+
+    File.open(users_path, 'w') do |file|
+      file.write(
+        "admin: '$2a$12$E79ZP6S6rO8aZhVqzV3MMu/F262kFUC7RR4PiigtD61LeOYoU8OnS'"
+        # secret
+      )
+    end
   end
 
   def teardown
     FileUtils::rm_rf(data_path)
-    # FileUtils::rm_rf(users_path)
+    FileUtils::rm_rf(users_path)
   end
 
   def test_index

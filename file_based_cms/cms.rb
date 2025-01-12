@@ -208,6 +208,14 @@ post '/users/login' do
   end
 end
 
+def valid_login?(username, password)
+  credentials = load_user_credentials
+  return false unless credentials.has_key?(username)
+# refactor
+  bcrypt_password = BCrypt::Password.new(credentials[username])
+  bcrypt_password == password
+end
+
 # Log out
 post '/users/logout' do
   session.delete(:username)
@@ -313,13 +321,7 @@ def markdown_to_html(string)
   markdown.render(string)
 end
 
-def valid_login?(username, password)
-  credentials = load_user_credentials
-  return false unless credentials.has_key?(username)
-# refactor
-  bcrypt_password = BCrypt::Password.new(credentials[username])
-  bcrypt_password == password
-end
+
 
 
 
