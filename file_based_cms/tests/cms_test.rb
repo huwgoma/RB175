@@ -223,10 +223,9 @@ class CMSTest < Minitest::Test
   end
 
   def test_logout
-    # Log in
-    post '/users/login', {}, login_session
-
-    post '/users/logout'
+    # Log in (login_session) and then log out (post /users/logout)
+    post '/users/logout', {}, login_session
+    
     assert_equal(302, last_response.status)
     assert_equal(false, session[:logged_in])
     assert_nil(session[:username])

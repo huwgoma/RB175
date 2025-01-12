@@ -207,10 +207,8 @@ end
 
 def valid_login?(username, password)
   credentials = load_user_credentials
-  return false unless credentials.has_key?(username)
-# refactor
-  bcrypt_password = BCrypt::Password.new(credentials[username])
-  bcrypt_password == password
+  
+  BCrypt::Password.new(credentials[username]) == password
 end
 
 # Log out
