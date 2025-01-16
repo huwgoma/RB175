@@ -5,7 +5,6 @@ Minitest::Reporters.use!
 
 require 'minitest/autorun'
 require 'rack/test'
-require 'fileutils'
 require 'yaml'
 require_relative('../cms') 
 
@@ -286,4 +285,3 @@ class CMSTest < Minitest::Test
     { 'rack.session' => { username: 'admin', logged_in: true }}
   end
 end
-
